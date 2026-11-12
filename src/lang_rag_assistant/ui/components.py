@@ -1,4 +1,4 @@
-"""Reusable rendering helpers for the Streamlit pages."""
+"""Reusable rendering helpers that reproduce the wireframe components."""
 
 from __future__ import annotations
 
@@ -24,15 +24,26 @@ NO_KEY_TEXT = (
     "GROQ_API_KEY or OPENAI_API_KEY to the environment file, then restart the app. "
     "Uploading and browsing documents still work."
 )
+NAV_ITEMS: tuple[tuple[str, str], ...] = (
+    ("chat", "Chat"),
+    ("history", "History"),
+    ("documents", "Documents"),
+    ("model", "Model and keys"),
+)
+CONVERSATION_LIMIT = 5
 
 
 def error_card(title: str, detail: str) -> None:
-    """Show a provider or document failure with its exact message."""
-    st.markdown(
+    """Show a provider or document failure as the wireframe's danger card."""
+    st.html(
         f'<div class="lrag-error"><h4>{html.escape(title)}</h4>'
-        f"<div>{html.escape(detail)}</div></div>",
-        unsafe_allow_html=True,
+        f"<div>{html.escape(detail)}</div></div>"
     )
+
+
+def no_key_banner() -> None:
+    """Show the no-key state as the wireframe's danger card."""
+    error_card(NO_KEY_TITLE, NO_KEY_TEXT)
 
 
 def citation_chips(items: Sequence[tuple[int, str, int]]) -> None:
@@ -43,7 +54,7 @@ def citation_chips(items: Sequence[tuple[int, str, int]]) -> None:
         f'<span class="lrag-chip"><b>[{number}]</b> {html.escape(name)} · p. {page}</span>'
         for number, name, page in items
     )
-    st.markdown(chips, unsafe_allow_html=True)
+    st.html(f"<div>{chips}</div>")
 
 
 def document_chips(names: Sequence[str]) -> None:
@@ -51,7 +62,7 @@ def document_chips(names: Sequence[str]) -> None:
     if not names:
         return
     chips = "".join(f'<span class="lrag-chip">{html.escape(name)}</span>' for name in names)
-    st.markdown(chips, unsafe_allow_html=True)
+    st.html(f"<div>{chips}</div>")
 
 
 def passage_list(passages: Sequence[tuple[int, RetrievedChunk]]) -> None:
@@ -61,28 +72,38 @@ def passage_list(passages: Sequence[tuple[int, RetrievedChunk]]) -> None:
         st.caption(chunk.text)
 
 
-def no_key_banner() -> None:
-    """Warn that no chat model can be used."""
-    st.warning(f"**{NO_KEY_TITLE}.** {NO_KEY_TEXT}")
+def _nav_key(name: str, current: str) -> str:
+    return "nav-active" if name == current else f"nav-{name}"
 
 
-def render_sidebar(services: Services) -> None:
-    """Brand, primary actions, the five most recent conversations, and the chat model."""
+def render_sidebar(services: Services, current: str) -> None:
+    """Sidebar per wireframe: brand, actions, and either conversations or navigation.
+
+    The chat page lists recent conversations and the chat model. Other pages list
+    the page navigation, as in the History, Documents and Model frames.
+    """
+    pages = {name: page_ref(name) for name, _ in NAV_ITEMS}
     with st.sidebar:
-        st.markdown('<div class="lrag-brand">Lang RAG <span>·</span> Assistant</div>', unsafe_allow_html=True)
-        if st.button("New conversation", key="sidebar-new"):
+        st.html('<div class="lrag-brand">Lang RAG <span>·</span> Assistant</div>')
+        if st.button("+ New conversation", key="sidebar-new", width="stretch"):
             st.session_state.pop("conversation_id", None)
-            st.switch_page(page_ref("chat"))
-        st.markdown('<div class="lrag-label">Conversations</div>', unsafe_allow_html=True)
-        for summary in services.repo.list_conversations(limit=5):
-            if st.button(summary.title, key=f"recent-{summary.id}"):
-                st.session_state["conversation_id"] = summary.id
-                st.switch_page(page_ref("chat"))
-        if st.button("See all history", key="sidebar-history"):
-            st.switch_page(page_ref("history"))
-        if st.button("Add a PDF", key="sidebar-add"):
-            st.switch_page(page_ref("documents"))
-        st.markdown('<div class="lrag-label" style="margin-top:16px">Chat model</div>', unsafe_allow_html=True)
-        option = selected_option(services)
-        label = option.model if option else NO_KEY_TITLE
-        st.markdown(f'<div class="lrag-mono">{html.escape(label)}</div>', unsafe_allow_html=True)
+            st.switch_page(pages["chat"])
+
+        if current == "chat":
+            st.html('<div class="lrag-label">Conversations</div>')
+            active = st.session_state.get("conversation_id")
+            for summary in services.repo.list_conversations(limit=CONVERSATION_LIMIT):
+                key = "recent-active" if summary.id == active else f"recent-{summary.id}"
+                if st.button(summary.title, key=key, width="stretch"):
+                    st.session_state["conversation_id"] = summary.id
+                    st.switch_page(pages["chat"])
+            if st.button("See all history", key="sidebar-history"):
+                st.switch_page(pages["history"])
+            option = selected_option(services)
+            st.html('<div class="lrag-label" style="margin-top:24px">Chat model</div>')
+            label = f"{option.provider} · {option.model}" if option else NO_KEY_TITLE
+            st.html(f'<div class="lrag-mono">{html.escape(label)}</div>')
+        else:
+            for name, label in NAV_ITEMS:
+                if st.button(label, key=_nav_key(name, current), width="stretch"):
+                    st.switch_page(pages[name])

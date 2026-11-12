@@ -16,5 +16,5 @@ def no_keys(monkeypatch):
 def test_app_without_keys_disables_send_and_shows_warning(no_keys):
     at = AppTest.from_file(str(MAIN), default_timeout=180).run()
     assert not at.exception
-    assert any("No model has an API key" in w.value for w in at.warning)
+    assert any("No model has an API key" in str(el.value) for el in at.get("html"))
     assert at.chat_input and at.chat_input[0].disabled
