@@ -51,7 +51,6 @@ class Settings:
     log_level: str
     data_dir: Path
     bundled_pdf_dir: Path
-    project_root: Path
 
 
 def _get(env: Mapping[str, str], name: str) -> str | None:
@@ -116,5 +115,4 @@ def load_settings(env: Mapping[str, str] | None = None) -> Settings:
         log_level=log_level,
         data_dir=PROJECT_ROOT / "data",
         bundled_pdf_dir=PROJECT_ROOT / "pdfs",
-        project_root=PROJECT_ROOT,
     )

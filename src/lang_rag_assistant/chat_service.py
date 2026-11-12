@@ -9,7 +9,12 @@ from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
-from lang_rag_assistant.agent import StepEvent, build_agent, extract_final_answer, map_stream_update
+from lang_rag_assistant.agent import (
+    StepEvent,
+    build_agent,
+    extract_final_answer,
+    map_stream_update,
+)
 from lang_rag_assistant.config.logging_config import get_logger
 from lang_rag_assistant.config.settings import Settings
 from lang_rag_assistant.database import Repository, SourceRecord

@@ -27,7 +27,7 @@ def _chat():
 
 
 def test_bundled_pdfs_are_indexed_with_pages(env):
-    repo, emb, kb = env
+    repo, _emb, kb = env
     results = ingest_bundled(repo=repo, kb=kb, chat_model=_chat(), provider="google_genai",
                              model_name="gemini-3.1-flash-lite", bundled_dir=BUNDLED_DIR)
     assert {r.name for r in results} == {"climate_change.pdf", "global_warming.pdf"}
@@ -37,7 +37,7 @@ def test_bundled_pdfs_are_indexed_with_pages(env):
 
 
 def test_same_bytes_are_not_indexed_twice(env):
-    repo, emb, kb = env
+    repo, _emb, kb = env
     pdf = (BUNDLED_DIR / "climate_change.pdf").read_bytes()
     first = ingest_pdf(repo=repo, kb=kb, chat_model=None, provider="google_genai", model_name="m",
                        source=pdf, name="copy.pdf", source_kind="uploaded")
@@ -48,7 +48,7 @@ def test_same_bytes_are_not_indexed_twice(env):
 
 
 def test_no_chat_model_leaves_questions_empty_with_warning(env):
-    repo, emb, kb = env
+    repo, _emb, kb = env
     result = ingest_pdf(repo=repo, kb=kb, chat_model=None, provider="groq", model_name="m",
                         source=(BUNDLED_DIR / "global_warming.pdf").read_bytes(),
                         name="g.pdf", source_kind="uploaded")
@@ -56,7 +56,7 @@ def test_no_chat_model_leaves_questions_empty_with_warning(env):
 
 
 def test_invalid_pdf_stores_nothing(env):
-    repo, emb, kb = env
+    repo, _emb, kb = env
     with pytest.raises(DocumentError):
         ingest_pdf(repo=repo, kb=kb, chat_model=None, provider="groq", model_name="m",
                    source=b"not a pdf", name="x.pdf", source_kind="uploaded")
@@ -64,7 +64,7 @@ def test_invalid_pdf_stores_nothing(env):
 
 
 def test_reembed_all_switches_model(env):
-    repo, emb, kb = env
+    repo, _emb, kb = env
     ingest_pdf(repo=repo, kb=kb, chat_model=None, provider="groq", model_name="m",
                source=(BUNDLED_DIR / "global_warming.pdf").read_bytes(), name="g.pdf", source_kind="uploaded")
     count = reembed_all(repo=repo, embeddings=DeterministicFakeEmbedding(size=4), embedding_model="BGE-M3")

@@ -18,7 +18,6 @@ class RetrievedChunk:
 
     chunk_id: int
     document_name: str
-    source_kind: str
     page_number: int
     text: str
     score: float
@@ -60,7 +59,6 @@ class KnowledgeBase:
             RetrievedChunk(
                 chunk_id=chunk.chunk_id,
                 document_name=chunk.document_name,
-                source_kind=chunk.source_kind,
                 page_number=chunk.page_number,
                 text=chunk.text,
                 score=score,

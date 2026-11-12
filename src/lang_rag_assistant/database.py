@@ -117,7 +117,6 @@ class MessageRecord:
     content: str
     sources: list[SourceRecord] = field(default_factory=list)
     followups: list[str] = field(default_factory=list)
-    created_at: str = ""
 
 
 @dataclass(frozen=True)
@@ -420,7 +419,6 @@ class Repository:
                     id=row["id"], role=row["role"], content=row["content"],
                     sources=[SourceRecord(**s) for s in json.loads(row["sources"])],
                     followups=json.loads(row["followups"]),
-                    created_at=row["created_at"],
                 )
                 for row in rows
             ]
