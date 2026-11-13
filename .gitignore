@@ -159,9 +159,17 @@ ENV/
 env.bak/
 venv.bak/
 
+# Logs
+logs/
+*.log
+
 # Spyder project settings
 .spyderproject
 .spyproject
+
+# IDE and Streamlit
+.vscode/
+.streamlit/
 
 # Rope project settings
 .ropeproject
@@ -218,3 +226,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# App data (SQLite database and per-conversation workspaces)
+data/
