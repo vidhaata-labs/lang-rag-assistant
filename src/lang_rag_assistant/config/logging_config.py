@@ -1,29 +1,31 @@
+"""Project-wide logging setup: stdout plus a rotating file in logs/."""
+
+from __future__ import annotations
+
 import logging
 import os
 import sys
-from pathlib import Path
-from dotenv import load_dotenv
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 
-load_dotenv()
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent.parent
-
-LOG_LEVEL = os.getenv("LANG_RAG_AGENT_LOG_LEVEL", "INFO").upper()
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+LOG_DIR = PROJECT_ROOT / "logs"
+LOG_FILE = LOG_DIR / "lang_rag_assistant.log"
 LOG_FORMAT = (
     "%(asctime)s | %(levelname)-8s | %(name)s\n"
     "    %(pathname)s:%(lineno)d in %(funcName)s()\n"
     "    pid=%(process)d tid=%(thread)d | %(message)s"
 )
 LOG_DATEFMT = "%Y-%m-%d %H:%M:%S"
-LOG_DIR = PROJECT_ROOT / "logs"
-LOG_FILE = LOG_DIR / "lang_rag_assistant.log"
 
 
 def configure_logging(level: str | None = None) -> None:
-    """Configure root logging once for the whole project, writing to stdout and logs/."""
-    level = level or LOG_LEVEL
-    os.makedirs(LOG_DIR, exist_ok=True)
+    """Configure root logging once, writing to stdout and logs/.
+
+    When `level` is None the `LOG_LEVEL` environment variable is used (default INFO).
+    """
+    resolved = (level or os.getenv("LOG_LEVEL", "INFO")).upper()
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
 
     formatter = logging.Formatter(LOG_FORMAT, datefmt=LOG_DATEFMT)
 
@@ -39,7 +41,7 @@ def configure_logging(level: str | None = None) -> None:
     file_handler.setFormatter(formatter)
 
     logging.basicConfig(
-        level=level,
+        level=resolved,
         handlers=[stream_handler, file_handler],
         force=True,
     )
