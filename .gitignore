@@ -167,6 +167,10 @@ logs/
 .spyderproject
 .spyproject
 
+# IDE and Streamlit
+.vscode/
+.streamlit/
+
 # Rope project settings
 .ropeproject
 
