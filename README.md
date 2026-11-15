@@ -2,7 +2,7 @@
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
 ![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)
-![Tests: 100 passing](https://img.shields.io/badge/tests-100%20passing-brightgreen.svg)
+![Tests: 102 passing](https://img.shields.io/badge/tests-102%20passing-brightgreen.svg)
 ![Code style: ruff](https://img.shields.io/badge/code_style-ruff-ff69b4.svg)
 ![Type check: ty](https://img.shields.io/badge/type_check-ty-8957e5.svg)
 ![Package manager: uv](https://img.shields.io/badge/package_manager-uv-3478f6.svg)
@@ -72,7 +72,7 @@ flowchart LR
     KB["KnowledgeBase: cosine search"]
     DB[("SQLite: documents, chunks, conversations")]
     WS["Conversation workspaces: retrieved passages"]
-    LLM["Chat models: Google, Groq, OpenAI"]
+    LLM["Chat models: Google, Groq, OpenAI, Requesty"]
     EMB["Embedding model: local, sentence-transformers"]
     CFG[".env read by settings.py"]
 
@@ -182,7 +182,7 @@ flowchart TD
 
 - Python 3.13+
 - [uv](https://docs.astral.sh/uv/) (recommended package manager)
-- At least one API key: Google GenAI, Groq or OpenAI
+- At least one API key: Google GenAI, Groq, OpenAI or Requesty
 
 ## Setup
 
@@ -195,13 +195,15 @@ Edit `.env` and set:
 
 | Variable | Description | Required |
 |----------|-------------|----------|
-| `LLM_PROVIDER` | Model preselected in the app: `google_genai`, `groq` or `openai` | No (default: `google_genai`) |
+| `LLM_PROVIDER` | Model preselected in the app: `google_genai`, `groq`, `openai` or `requesty` | No (default: `google_genai`) |
 | `GOOGLE_MODEL` | Gemini model name | No (default: `gemini-3.1-flash-lite`) |
 | `GROQ_MODEL` | Groq model name | No (default: `llama-3.1-8b-instant`) |
 | `OPENAI_MODEL` | OpenAI model name | No (default: `gpt-4o-mini`) |
+| `REQUESTY_MODEL` | Requesty model id | No (default: `nemotron-3-ultra-550b-a55b`) |
 | `GOOGLE_API_KEY` | Google Gemini API key (from https://makersuite.google.com/app/apikey) | At least one key |
 | `GROQ_API_KEY` | Groq API key (from https://console.groq.com/keys) | At least one key |
 | `OPENAI_API_KEY` | OpenAI API key (from https://platform.openai.com/api-keys) | At least one key |
+| `REQUESTY_API_KEY` | Requesty API key (from https://app.requesty.ai/api-keys). Calls use `https://router.requesty.ai/v1`. The default model is on the free tier (200 requests per day, no credit card). | At least one key |
 | `EMBEDDING_MODEL` | `all-MiniLM-L6-v2`, `nomic-embed-text` or `BGE-M3` | No (default: `all-MiniLM-L6-v2`) |
 | `MAX_CONCURRENT_ANALYSTS` | Parallel chunk-analyst subagents, 2 to 5 | No (default: `3`) |
 | `LOG_LEVEL` | `DEBUG`, `INFO`, `WARNING`, `ERROR` or `CRITICAL` | No (default: `INFO`) |
@@ -219,7 +221,7 @@ The first start downloads the embedding model from Hugging Face, then indexes th
 ## Running Tests
 
 ```bash
-uv run pytest          # 100 tests
+uv run pytest          # 102 tests
 uv run ruff check src tests
 uv run ty check src    # type check
 ```

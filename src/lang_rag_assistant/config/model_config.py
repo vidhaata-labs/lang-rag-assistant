@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
@@ -26,7 +27,11 @@ PROVIDER_KEY_ENV: dict[str, str] = {
     "google_genai": "GOOGLE_API_KEY",
     "groq": "GROQ_API_KEY",
     "openai": "OPENAI_API_KEY",
+    "requesty": "REQUESTY_API_KEY",
 }
+
+# Requesty is an OpenAI-compatible gateway. The free-tier default model is set in settings.
+REQUESTY_BASE_URL = "https://router.requesty.ai/v1"
 
 
 @dataclass(frozen=True)
@@ -69,7 +74,19 @@ def create_chat_model(option: ChatModelOption) -> Any:
 
     # One retry at most: the SDKs retry rate-limited calls with back-off, and a
     # long silent wait before the error is shown is worse than a plain message.
-    return init_chat_model(model=option.model, model_provider=option.provider, max_retries=1)
+    model_provider = option.provider
+    extra: dict[str, Any] = {}
+    if option.provider == "requesty":
+        # LangChain has no Requesty integration. The router speaks the OpenAI API.
+        model_provider = "openai"
+        key = os.environ.get(option.api_key_env, "").strip()
+        if not key:
+            raise ConfigurationError(f"{option.api_key_env} is not set, so {option.model} cannot be used.")
+        extra["api_key"] = key
+        extra["base_url"] = REQUESTY_BASE_URL
+    return init_chat_model(
+        model=option.model, model_provider=model_provider, max_retries=1, **extra
+    )
 
 
 def create_embeddings(name: str) -> Any:

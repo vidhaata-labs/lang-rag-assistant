@@ -13,17 +13,19 @@ from lang_rag_assistant.errors import ConfigurationError
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
-SUPPORTED_PROVIDERS: tuple[str, ...] = ("google_genai", "groq", "openai")
+SUPPORTED_PROVIDERS: tuple[str, ...] = ("google_genai", "groq", "openai", "requesty")
 DEFAULT_PROVIDER = "google_genai"
 DEFAULT_CHAT_MODELS: dict[str, str] = {
     "google_genai": "gemini-3.1-flash-lite",
     "groq": "llama-3.1-8b-instant",
     "openai": "gpt-4o-mini",
+    "requesty": "nemotron-3-ultra-550b-a55b",
 }
 MODEL_ENV_VARS: dict[str, str] = {
     "google_genai": "GOOGLE_MODEL",
     "groq": "GROQ_MODEL",
     "openai": "OPENAI_MODEL",
+    "requesty": "REQUESTY_MODEL",
 }
 
 EMBEDDING_MODELS: dict[str, str] = {
