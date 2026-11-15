@@ -9,6 +9,7 @@ def test_defaults_use_google_and_groq_llama():
     assert s.llm_provider == "google_genai"
     assert s.chat_model_names["groq"] == "llama-3.1-8b-instant"
     assert s.chat_model_names["google_genai"] == "gemini-3.1-flash-lite"
+    assert s.chat_model_names["requesty"] == "nemotron-3-ultra-550b-a55b"
     assert s.embedding_model == "all-MiniLM-L6-v2"
     assert s.max_concurrent_analysts == 3
     assert s.log_level == "INFO"
