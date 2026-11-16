@@ -31,6 +31,7 @@ PROVIDER_LABELS: dict[str, str] = {
     "groq": "Groq",
     "openai": "OpenAI",
     "requesty": "Requesty",
+    "nvidia": "NVIDIA",
 }
 _PAGES_KEY = "_app_pages"
 

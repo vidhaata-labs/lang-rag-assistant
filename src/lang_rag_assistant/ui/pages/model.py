@@ -64,7 +64,7 @@ def _choose(services: Services) -> None:
         show_alert(
             "info",
             "No model configured",
-            "Add an API key for Google GenAI, Groq, OpenAI or Requesty in .env and restart the app.",
+            "Add an API key for Google GenAI, Groq, OpenAI, Requesty or NVIDIA in .env and restart the app.",
         )
 
     if st.button("Use this model", type="primary", disabled=chat_label is None, key="use_model"):

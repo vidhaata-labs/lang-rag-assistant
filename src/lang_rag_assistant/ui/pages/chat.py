@@ -113,7 +113,7 @@ def _no_model(services: Services) -> None:
         show_alert(
             "info",
             "No model configured",
-            "Add an API key for Google GenAI, Groq, OpenAI or Requesty in .env, restart the app, "
+            "Add an API key for Google GenAI, Groq, OpenAI, Requesty or NVIDIA in .env, restart the app, "
             "then choose a model on the Model page.",
         )
     else:

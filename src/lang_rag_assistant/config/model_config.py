@@ -28,10 +28,13 @@ PROVIDER_KEY_ENV: dict[str, str] = {
     "groq": "GROQ_API_KEY",
     "openai": "OPENAI_API_KEY",
     "requesty": "REQUESTY_API_KEY",
+    "nvidia": "NVIDIA_API_KEY",
 }
 
 # Requesty is an OpenAI-compatible gateway. The free-tier default model is set in settings.
 REQUESTY_BASE_URL = "https://router.requesty.ai/v1"
+# NVIDIA Integrate API is OpenAI-compatible.
+NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
 
 @dataclass(frozen=True)
@@ -84,6 +87,16 @@ def create_chat_model(option: ChatModelOption) -> Any:
             raise ConfigurationError(f"{option.api_key_env} is not set, so {option.model} cannot be used.")
         extra["api_key"] = key
         extra["base_url"] = REQUESTY_BASE_URL
+    elif option.provider == "nvidia":
+        # NVIDIA Integrate API is OpenAI-compatible.
+        model_provider = "openai"
+        key = os.environ.get(option.api_key_env, "").strip()
+        if not key:
+            raise ConfigurationError(f"{option.api_key_env} is not set, so {option.model} cannot be used.")
+        extra["api_key"] = key
+        # Allow override via NVIDIA_BASE_URL for testing/custom endpoints.
+        base_url = (os.environ.get("NVIDIA_BASE_URL") or "").strip() or NVIDIA_BASE_URL
+        extra["base_url"] = base_url
     return init_chat_model(
         model=option.model, model_provider=model_provider, max_retries=1, **extra
     )
