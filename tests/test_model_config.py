@@ -1,6 +1,7 @@
 from lang_rag_assistant.config.model_config import (
     REQUESTY_BASE_URL,
     create_chat_model,
+    friendly_model_name,
     list_chat_model_options,
 )
 from lang_rag_assistant.config.settings import load_settings
@@ -37,6 +38,18 @@ def test_requesty_default_model_and_key_flag():
     assert option.has_key is True
     assert option.key == "requesty:nemotron-3-ultra-550b-a55b"
     assert option.api_key_env == "REQUESTY_API_KEY"
+
+
+def test_friendly_model_names():
+    assert friendly_model_name("gpt-4o-mini") == "GPT-4o mini"
+    assert friendly_model_name("gemini-3.1-flash-lite") == "Gemini 3.1 Flash Lite"
+    assert friendly_model_name("llama-3.1-8b-instant") == "Llama 3.1 8B Instant"
+    assert friendly_model_name("nemotron-3-ultra-550b-a55b") == "Nemotron 3 Ultra 550B"
+    assert friendly_model_name("nvidia/nemotron-3-ultra-550b-a55b") == "Nemotron 3 Ultra 550B"
+
+
+def test_friendly_model_name_fallback_prettifies_unknown_id():
+    assert friendly_model_name("some-owner/some-model-2") == "Some Model 2"
 
 
 def test_requesty_chat_model_uses_openai_router(monkeypatch):
