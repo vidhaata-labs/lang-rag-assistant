@@ -10,11 +10,12 @@ def test_options_list_one_per_provider_with_key_flags():
     env = {"GOOGLE_API_KEY": "x"}
     options = list_chat_model_options(load_settings(env=env), env)
     by_provider = {o.provider: o for o in options}
-    assert set(by_provider) == {"google_genai", "groq", "openai", "requesty"}
+    assert set(by_provider) == {"google_genai", "groq", "openai", "requesty", "nvidia"}
     assert by_provider["google_genai"].has_key is True
     assert by_provider["groq"].has_key is False
     assert by_provider["openai"].has_key is False
     assert by_provider["requesty"].has_key is False
+    assert by_provider["nvidia"].has_key is False
 
 
 def test_empty_key_counts_as_missing():
