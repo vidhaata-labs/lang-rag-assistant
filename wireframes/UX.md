@@ -52,18 +52,21 @@ flowchart TD
 
 Doop frames: Model · Configure (`Ox0gxjGEvs`), Model · Provider without key (`FkOEHsTCFm`).
 
+The picker shows a friendly model name plus its provider (section 15), with the provider line rendered below the selected model name in smaller, muted type. The provider-keys table on the right uses friendly names and stretches to the full width of its pane.
+
 ```mermaid
 flowchart TD
-    A[Model page] --> B[Select chat model: one model per provider, configured providers only]
-    B --> D[Select embedding model, default all-MiniLM-L6-v2 local]
-    D --> E[Provider key table shows Configured or Missing key]
+    A[Model page] --> B[Select chat model: friendly name plus provider, configured providers only]
+    B --> C[Provider line below the selected model: provider plus full model id, 12px muted]
+    C --> D[Select embedding model, default all-MiniLM-L6-v2 local]
+    D --> E[Provider key table (full pane width) shows Configured or Missing key]
     E --> F{Click Use this model}
     F -- Selection is valid --> G[Save selection]
     G --> H[Success confirmation]
     H --> I[Chat uses the selected model]
     F -- Saved provider has no key --> J[Warning alert: No API key for provider]
-    J --> K[Use this model is disabled]
-    K --> L[Add key to .env and restart, or pick another provider]
+    J --> K[Picker lists models that still have a key]
+    K --> L[Add the missing key to .env and restart, or use another provider]
 ```
 
 ---
@@ -151,7 +154,7 @@ flowchart TD
     J --> K[Model page]
 ```
 
-The wireframe shows only the rate-limit alert. Quota, unavailable and key-rejected messages are an **Open point**.
+Each provider failure has its own frame, using the copy the app shows. Rate limit, unavailable and model error offer Try again and Change model. Quota exhausted and API key rejected offer Change model only.
 
 ---
 
@@ -203,7 +206,7 @@ Indexing failure is an **Open point**: the wireframes do not show a failed index
 
 ## 9. Suggested questions (Documents to Chat)
 
-Doop frame: Documents · Library (`2_tdH7XC9j`). Each document has a Suggested questions expander, which is collapsed in the wireframes.
+Doop frame: Documents · Library (`2_tdH7XC9j`). Each document card has a Suggested questions expander under it, collapsed in the wireframe. Add a PDF sits under the page caption.
 
 ```mermaid
 flowchart LR
@@ -246,15 +249,21 @@ The active page is highlighted in the sidebar with the accent colour (section 14
 | Chat | Empty state with suggestions | `rwjJNpYRhs` | `st.chat_input`, `st.pills`, `st.caption` |
 | Chat | Answer with sources | `h6nBr0rxtv` | `st.chat_message`, `st.status` (compact), `st.expander`, `st.pills` |
 | Chat | Generating with Stop | `_CXI8sszwm` | `st.chat_input(submit_mode="stop")`, `st.status` (steps) |
-| Chat | Provider error | `10BpD4Db9k` | `st.chat_message`, `st.error(title=...)`, `st.button` ×2 |
+| Chat | Provider error, rate limit | `10BpD4Db9k` | `st.chat_message`, `st.error(title=...)`, `st.button` ×2 |
+| Chat | Stopped answer | `pVTKQvmkGv` | `st.chat_message`, `st.caption` ("Stopped"), `st.expander` |
+| Chat | Quota exhausted | `IXUKxQKCwE` | `st.error(title=...)`, `st.button` (Change model) |
+| Chat | Provider unavailable | `7qt1YoO1SN` | `st.error(title=...)`, `st.button` ×2 |
+| Chat | API key rejected | `HsLedSgDZK` | `st.error(title=...)`, `st.button` (Change model) |
+| Chat | Model could not answer | `0oX5cyl1Dm` | `st.error(title=...)`, `st.button` ×2 |
 | Chat | No model configured | `EYCJN-8k_B` | `st.info(title=...)`, `st.button`, `st.chat_input` (disabled), `st.sidebar.selectbox` (disabled) |
 | History | Saved conversations | `pyrwXMg5_6` | `st.text_input`, `st.container(border=True)`, `st.button` (Resume) |
 | History | Empty | `IUgPU07tjH` | `st.info(title=...)`, `st.button` |
 | Documents | Library | `2_tdH7XC9j` | `st.button` (Add a PDF), `st.container(border=True)`, `st.badge`, `st.expander` |
 | Documents | Upload and indexing | `Q5lTDNl-YB` | `st.file_uploader`, `st.button`, `st.status`, `st.progress` |
 | Documents | Invalid PDF | `h6UYB94Y-j` | `st.file_uploader`, `st.error(title=...)`, `st.button` |
-| Model | Configure | `Ox0gxjGEvs` | `st.selectbox` ×2, `st.button` (Use this model), `st.table` or `st.dataframe` for keys |
-| Model | Provider without key | `FkOEHsTCFm` | `st.selectbox`, `st.warning(title=...)`, `st.button` (disabled) |
+| Model | Configure | `Ox0gxjGEvs` | `st.selectbox` ×2 (friendly name plus provider, `help` with full model id), `st.html` provider line below selection, `st.button` (Use this model), `st.table(width="stretch")` for keys with friendly names |
+| Model | Provider without key | `FkOEHsTCFm` | `st.selectbox`, `st.html` provider line, `st.warning(title=...)`, `st.button` (Use this model stays enabled when another provider has a key) |
+| Model | Re-embed documents | `fkAt6vnRkv` | `st.dialog`, `st.button` ×2 |
 
 ---
 
@@ -271,9 +280,9 @@ These need your approval before implementation. My recommendation is in each ent
    codeFont = "'JetBrains Mono':https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap"
    ```
 
-3. **Stop keeps the partial answer,** marks it Stopped, and saves it. Recommended. The wireframes do not show the marker.
-4. **Quota, unavailable and key-rejected messages** use the same alert pattern as rate limit, with the copy written during implementation. Recommended.
-5. **Changing the embedding model** would need documents to be re-indexed. Not in the wireframes. Proposal: warn the user and re-index on confirm.
+3. **Decided: Stop keeps the partial answer,** marks it Stopped, and saves it. Frame `pVTKQvmkGv`.
+4. **Decided: quota, unavailable, key-rejected and model-error messages** use the same alert pattern as rate limit, with the copy in `errors.py`. Frames `IXUKxQKCwE`, `7qt1YoO1SN`, `HsLedSgDZK` and `0oX5cyl1Dm`.
+5. **Decided: changing the embedding model** warns the user and re-embeds on confirm. Frame `fkAt6vnRkv`.
 6. **Model selection is saved** to the local database, so it survives a restart. Not in the wireframes. Proposal: save it.
 7. **History search** matches conversation titles only. Not in the wireframes. Proposal: titles only.
 8. **Indexing failure** shows an error alert, and the file is not added to the library. Not in the wireframes. Proposal: add it, using the Invalid PDF pattern.
@@ -300,12 +309,12 @@ Decided after the review: Stop saves the partial answer marked Stopped (the core
 
 ## 14. Sidebar brand, navigation and footer (added after the build)
 
-Added after the build, so the Doop frames do not show it yet. Every page uses the same sidebar, top to bottom:
+Every page uses the same sidebar, top to bottom. The Doop frames show this sidebar.
 
 1. **Brand row.** The app icon with the title "Lang RAG Assistant" beside it, as one image above the menu. Title in Inter Bold, 16px, colour `#1F1B16`, 10px gap from a 32px icon with 8px corner radius. The browser tab shows the icon alone.
 2. **Menu.** Chat, History, Documents, Model. The active item uses the accent colour `#B45309`, semibold. No collapse or expand toggle, because the wireframes show none and the sidebar stays open.
-3. **Chat only:** the chat model picker and the New chat button (section 13).
-4. **Footer.** "Powered by Vidhaata Labs", 13px Inter in the muted token `#6B6158`, pinned to the bottom-left of the sidebar on every page. The Doop frames carry it as the last item in each sidebar (12 screen frames). The wireframes gave no footer spec, so these values were chosen during the build.
+3. **Chat only:** the chat model picker (friendly name plus provider, with the provider line below the selected model; section 15) and the New chat button (section 13).
+4. **Footer.** "Powered by Vidhaata Labs", 13px Inter in the muted token `#6B6158`, pinned to the bottom-left of the sidebar on every page. It is the last item in each screen's sidebar. The wireframes gave no footer spec, so these values were chosen during the build.
 
 ```mermaid
 flowchart TD
@@ -316,3 +325,24 @@ flowchart TD
 ```
 
 Decided: the brand row sits above the menu, not below it. Streamlit's native logo cannot hold text, so the title is drawn into the logo image and its font is approximated from Inter Bold, so the rendering may differ slightly from the wireframe type.
+
+---
+
+## 15. Friendly model names, provider line and limited padding (added after the build)
+
+**Friendly names.** Raw model ids are long (for example `nvidia/nemotron-3-ultra-550b-a55b`) and pushed the provider off the edge of the picker, so the label was hard to read. The picker now shows a short friendly name plus its provider: `GPT-4o mini · OpenAI`, `Gemini 3.1 Flash Lite · Google GenAI`, `Llama 3.1 8B Instant · Groq`, `Nemotron 3 Ultra 550B · Requesty`, `Nemotron 3 Ultra 550B · NVIDIA`. Requesty and NVIDIA share the same friendly name, so the provider suffix keeps them distinct. The full raw model id stays visible as the selectbox `help` tooltip and in the provider line below the selection, and custom `*_MODEL` overrides fall back to a prettified form of the id. The provider-keys table on the Model page also uses friendly names.
+
+**Provider line.** Streamlit's `st.selectbox` renders each option as a single line of plain text, so a two-line option with a smaller, lighter provider inside the dropdown is not supported natively. Instead, the selected model's provider is shown on the line below the model name, in smaller and lighter type: 12px Inter in the muted token `#6B6158` (body text is `#1F1B16`), reading e.g. `NVIDIA · nvidia/nemotron-3-ultra-550b-a55b`. It appears in the Chat sidebar under the picker and on the Model page under the chat-model picker. The Doop frames show the same line, for example `OpenAI · gpt-4o-mini` under `GPT-4o mini · OpenAI`.
+
+**Right pane full width.** The Model page used a 3:2 column split, so the right pane (provider keys) was narrower than the picker and its table did not fill the bordered container. The split is now 1:1 with a small gap, both bordered containers use `width="stretch"`, and the keys table uses `width="stretch"` with `alt="Provider keys: which providers have a configured key and their default chat model"`, so the right pane stretches to the full width of its column.
+
+**Limited padding.** To keep content tight and use the available width on every page, `.streamlit/config.toml` sets `paddingTop = "1rem"` and `paddingBottom = "1rem"` on `[theme]`, and `paddingTop = "0.5rem"` with `paddingBottom = "1rem"` on `[theme.sidebar]`. These are the supported theme keys for page and sidebar spacing (Streamlit offers no left/right padding keys), so no `.block-container` CSS is used.
+
+```mermaid
+flowchart TD
+    A[Raw model id] --> B[Friendly name plus provider suffix in picker]
+    B --> C[Full id in help tooltip]
+    B --> D[Provider line below selection: provider plus full id, 12px muted]
+    D --> E[Model page: 1 to 1 panes, table stretches full pane width]
+    E --> F[All pages: limited top and bottom padding plus tight sidebar padding]
+```

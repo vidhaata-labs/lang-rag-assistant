@@ -13,13 +13,27 @@ from pathlib import Path
 import streamlit as st
 
 PAGE_ICON = Path(__file__).resolve().parent / "assets" / "app_icon.png"
-# Sidebar logo: app_icon.png with the title drawn beside it in Inter Bold 16px, #1F1B16, 10px gap.
+# Sidebar logo: the 32px icon with "Lang RAG Assistant" beside it.
+# Rasterized at 4x (128px icon, 8px corner radius, 10px gap, Inter Bold 16px, #1F1B16)
+# and cropped to the icon's height. st.logo size="large" is 32px tall for the whole
+# image, so any vertical padding would shrink the icon and the title.
 SIDEBAR_LOGO = Path(__file__).resolve().parent / "assets" / "app_logo.png"
 
 CSS = """
 /* Sidebar: the four menu items only; no collapse or expand toggle. */
 [data-testid="stSidebarCollapseButton"], [data-testid="collapsedControl"] {
     display: none;
+}
+
+/* Selected model provider: rendered below the model name, smaller and muted. */
+.lrag-model-provider {
+    font-family: var(--font-body, "Inter", system-ui, sans-serif);
+    font-size: 12px;
+    line-height: 1.35;
+    color: #6B6158;
+    margin-top: -6px;
+    margin-bottom: 8px;
+    overflow-wrap: anywhere;
 }
 
 /* Sidebar footer: pinned to the bottom of the sidebar on every page. */

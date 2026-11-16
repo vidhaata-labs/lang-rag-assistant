@@ -16,7 +16,9 @@ from lang_rag_assistant.ui.services import (
     EMBEDDING_SETTING,
     PROVIDER_LABELS,
     Services,
+    option_help,
     option_label,
+    provider_line,
     save_selection,
     saved_option_key,
     selected_option,
@@ -26,10 +28,10 @@ from lang_rag_assistant.ui.services import (
 def render(services: Services) -> None:
     st.title("Model")
     st.caption("Choose the chat model and the embedding model. Only models whose provider has a configured key are listed.")
-    picker, keys = st.columns([3, 2], vertical_alignment="top")
-    with picker, st.container(border=True):
+    picker, keys = st.columns([1, 1], gap="small", vertical_alignment="top")
+    with picker, st.container(border=True, width="stretch"):
         _choose(services)
-    with keys, st.container(border=True):
+    with keys, st.container(border=True, width="stretch"):
         _key_table(services)
 
 
@@ -43,9 +45,12 @@ def _choose(services: Services) -> None:
         [option_label(o) for o in enabled],
         index=enabled.index(current) if current in enabled else None,
         placeholder="No models available",
+        help=option_help(current) if current else None,
         disabled=not enabled,
         key="model_chat_pick",
     )
+    if current is not None:
+        st.html(provider_line(current))
     embedding_choice = st.selectbox(
         "Embedding model",
         list(EMBEDDING_MODELS),
@@ -102,8 +107,10 @@ def _key_table(services: Services) -> None:
     st.table(
         {
             "Provider": [PROVIDER_LABELS[p] for p in SUPPORTED_PROVIDERS],
-            "Default model": [by_provider[p].model for p in SUPPORTED_PROVIDERS],
+            "Default model": [by_provider[p].display_name for p in SUPPORTED_PROVIDERS],
             "Key": ["Configured" if by_provider[p].has_key else "Missing key" for p in SUPPORTED_PROVIDERS],
-        }
+        },
+        width="stretch",
+        alt="Provider keys: which providers have a configured key and their default chat model",
     )
     st.caption("Keys are read from .env. A provider with a missing key is listed but cannot be selected.")

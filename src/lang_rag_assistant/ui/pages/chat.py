@@ -21,7 +21,9 @@ from lang_rag_assistant.ui.services import (
     Services,
     chat_model_for,
     navigate_to,
+    option_help,
     option_label,
+    provider_line,
     save_selection,
     selected_option,
 )
@@ -95,10 +97,13 @@ def _sidebar(services: Services, option: ChatModelOption | None) -> None:
                 "Chat model",
                 [option_label(o) for o in enabled],
                 index=enabled.index(option) if option in enabled else None,
+                help=option_help(option) if option else None,
                 key="chat_model_pick",
                 on_change=_on_model_change,
                 args=(services,),
             )
+            if option is not None:
+                st.html(provider_line(option))
         st.button(
             "New chat",
             key="new_chat",

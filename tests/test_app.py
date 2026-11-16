@@ -12,7 +12,7 @@ from lang_rag_assistant.ui import services as svc
 
 TIMEOUT = 120
 PROVIDER_ENV = ("GOOGLE_API_KEY", "GROQ_API_KEY", "OPENAI_API_KEY")
-OPENAI_LABEL = "gpt-4o-mini · OpenAI"
+OPENAI_LABEL = "GPT-4o mini · OpenAI"
 
 
 class _FailingModel:

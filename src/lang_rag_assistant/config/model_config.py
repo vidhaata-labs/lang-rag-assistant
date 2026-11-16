@@ -20,6 +20,7 @@ __all__ = [
     "ChatModelOption",
     "create_chat_model",
     "create_embeddings",
+    "friendly_model_name",
     "list_chat_model_options",
 ]
 
@@ -36,6 +37,48 @@ REQUESTY_BASE_URL = "https://router.requesty.ai/v1"
 # NVIDIA Integrate API is OpenAI-compatible.
 NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1"
 
+# Short display names for the configured defaults. Lookup falls back to a
+# prettified form of the raw model id so custom overrides still read cleanly.
+FRIENDLY_MODEL_NAMES: dict[str, str] = {
+    "gemini-3.1-flash-lite": "Gemini 3.1 Flash Lite",
+    "llama-3.1-8b-instant": "Llama 3.1 8B Instant",
+    "gpt-4o-mini": "GPT-4o mini",
+    "nemotron-3-ultra-550b-a55b": "Nemotron 3 Ultra 550B",
+    "nvidia/nemotron-3-ultra-550b-a55b": "Nemotron 3 Ultra 550B",
+}
+
+_TOKEN_DISPLAY: dict[str, str] = {
+    "gpt": "GPT",
+    "llama": "Llama",
+    "gemini": "Gemini",
+    "nemotron": "Nemotron",
+    "ultra": "Ultra",
+    "flash": "Flash",
+    "lite": "Lite",
+    "instant": "Instant",
+    "mini": "mini",
+    "nano": "nano",
+}
+
+
+def friendly_model_name(model: str) -> str:
+    """Short, readable name for a raw model id, e.g. "GPT-4o mini"."""
+    if model in FRIENDLY_MODEL_NAMES:
+        return FRIENDLY_MODEL_NAMES[model]
+    base = model.split("/")[-1].replace("_", "-")
+    parts: list[str] = []
+    for token in base.split("-"):
+        if not token:
+            continue
+        lower = token.lower()
+        if lower in _TOKEN_DISPLAY:
+            parts.append(_TOKEN_DISPLAY[lower])
+        elif token.isdigit() or token[0].isdigit():
+            parts.append(token)
+        else:
+            parts.append(token[:1].upper() + token[1:])
+    return " ".join(parts) if parts else model
+
 
 @dataclass(frozen=True)
 class ChatModelOption:
@@ -50,6 +93,11 @@ class ChatModelOption:
     def key(self) -> str:
         """Stable identifier, `provider:model`."""
         return f"{self.provider}:{self.model}"
+
+    @property
+    def display_name(self) -> str:
+        """Friendly model name, e.g. "GPT-4o mini"."""
+        return friendly_model_name(self.model)
 
 
 def list_chat_model_options(settings: Settings, env: Mapping[str, str]) -> list[ChatModelOption]:

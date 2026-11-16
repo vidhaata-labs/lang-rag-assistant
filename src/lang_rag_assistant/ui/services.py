@@ -15,6 +15,7 @@ from lang_rag_assistant.config.model_config import (
     ChatModelOption,
     create_chat_model,
     create_embeddings,
+    friendly_model_name,
     list_chat_model_options,
 )
 from lang_rag_assistant.config.settings import Settings, load_settings
@@ -37,8 +38,22 @@ _PAGES_KEY = "_app_pages"
 
 
 def option_label(option: ChatModelOption) -> str:
-    """The label shown in pickers, for example "gpt-4o-mini · OpenAI"."""
-    return f"{option.model} · {PROVIDER_LABELS[option.provider]}"
+    """The label shown in pickers, for example "GPT-4o mini · OpenAI"."""
+    return f"{friendly_model_name(option.model)} · {PROVIDER_LABELS[option.provider]}"
+
+
+def option_help(option: ChatModelOption) -> str:
+    """Tooltip for a picker: provider and full model id."""
+    return f"{PROVIDER_LABELS[option.provider]} · {option.model}"
+
+
+def provider_line(option: ChatModelOption) -> str:
+    """HTML for the provider line rendered below the selected model name."""
+    import html
+
+    provider = html.escape(PROVIDER_LABELS[option.provider])
+    model = html.escape(option.model)
+    return f'<div class="lrag-model-provider">{provider} · {model}</div>'
 
 
 @dataclass

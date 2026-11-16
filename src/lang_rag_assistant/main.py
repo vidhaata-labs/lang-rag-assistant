@@ -41,7 +41,7 @@ def main() -> None:
     st.set_page_config(
         page_title="Lang RAG Assistant",
         page_icon=str(PAGE_ICON),
-        layout="centered",
+        layout="wide",
         initial_sidebar_state="expanded",
     )
     apply_theme()

@@ -11,7 +11,12 @@ def test_sidebar_logo_carries_the_title_and_icon():
     assert theme.SIDEBAR_LOGO.is_file()
     with Image.open(theme.SIDEBAR_LOGO) as logo:
         width, height = logo.size
+        # st.logo size="large" fixes the image height at 32px. Vertical padding
+        # would shrink the 32px icon and the 16px title, so the artwork is cropped
+        # to the icon's bounds.
+        bbox = logo.getchannel("A").getbbox()
     assert width > height  # icon followed by the title, so wider than tall
+    assert bbox == (0, 0, width, height)
 
 
 def test_active_menu_item_uses_the_wireframe_accent():
